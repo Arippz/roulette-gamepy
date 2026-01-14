@@ -1,0 +1,7 @@
+# Python Version 3.14.0
+
+# Requirements for the PySide6 project
+PySide6==6.10.1
+PySide6_Addons==6.10.1
+PySide6_Essentials==6.10.1
+shiboken6==6.10.1
