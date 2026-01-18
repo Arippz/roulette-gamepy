@@ -1,3 +1,4 @@
+from player import Player
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QAction
 from layout_colorWidget import Color
@@ -14,45 +15,12 @@ from PySide6.QtWidgets import (
 )
 
 import sys
-import random
-# if rock == True and scissor == True:
-#     scissor == False
-
-
-
-
-class Player():
-    def __init__(self, username, lives, turn):
-        self.username = username
-        self.lives = lives
-        self.turn = turn
-
-    def doAction(self, turnInput, turnInput2):
-        self.turn = turnInput
-        self.turn2 = turnInput2
-        if self.turn == "rock" and self.turn2 == "scissor":
-            print(f'Your turn {self.turn}')
-            print(f'Opponent turn {self.turn2}')
-            print("You win")
-        elif self.turn == "rock" and self.turn2 == "paper":
-            print(f'Your turn {self.turn}')
-            print(f'Opponent turn {self.turn2}')
-            print("You lose")
-        else:
-            print(f'Your turn {self.turn}')
-            print(f'Opponent turn {self.turn2}')
-            print("Draw")
-        
-
-turnShapes = ["rock", "scissor", "paper"]
 
 
 player1 = Player("Ripp", 3, "rock")
 
 
-player1.doAction("rock", random.choice(turnShapes))
-
-
+player1.doAction("paper")
 # class MainWindow(QMainWindow):
 #     def __init__(self):
 #         super().__init__()
