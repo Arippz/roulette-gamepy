@@ -1,4 +1,4 @@
-from player import Player
+from player import Player, Enemy
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QAction
 from layout_colorWidget import Color
@@ -17,10 +17,31 @@ from PySide6.QtWidgets import (
 import sys
 
 
-player1 = Player("Ripp", 3, "rock")
+class Game():
+    def __int__(self, round, turn):
+        self.round = round
+        self.turn = turn
+        self.enemyTurn = Enemy.doAction()
+    def game(self):
+        if self.turn == "rock" and self.enemyTurn == "scissor" or \
+            self.turn == "scissor" and self.enemyTurn == "paper" or \
+            self.turn == "paper" and self.enemyTurn == "rock":
+            print(f'Your turn {self.turn}')
+            print(f'Opponent turn {self.enemyTurn}')
+            print("You win")
+        elif self.turn == self.enemyTurn:
+            print(f'Your turn {self.turn}')
+            print(f'Opponent turn {self.enemyTurn}')
+            print("Draw")
+        else:
+            print(f'Your turn {self.turn}')
+            print(f'Opponent turn {self.enemyTurn}')
+            print("You lose")
+        
+player1 = Player("Ripp", 3, "paper")
 
+player1.doAction()
 
-player1.doAction("paper")
 # class MainWindow(QMainWindow):
 #     def __init__(self):
 #         super().__init__()
