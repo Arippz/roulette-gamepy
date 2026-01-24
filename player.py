@@ -6,15 +6,18 @@ class Player():
     def __init__(self, username, lives, turn):
         self.username = username
         self.lives = lives
-        self.turn = turn
-        
 
+    @staticmethod
+    def playerTurn():
+        turn = "rock"
+        return turn
 class Enemy():
-    turnShapes = ["rock", "scissor", "paper"]
+
     def __init__(self, lives, enemyTurn):
         self.lives = lives
-        self.enemyTurn = enemyTurn
     
-    def doAction(self):
-        self.enemyTurn = random.choice(self.turnShapes)
-        return self.enemyTurn
+    @staticmethod
+    def turnShuffle():
+        turnShapes = ["rock", "scissor", "paper"]
+        enemyTurn = random.choice(turnShapes)
+        return enemyTurn
