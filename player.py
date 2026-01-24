@@ -21,3 +21,6 @@ class Enemy():
         turnShapes = ["rock", "scissor", "paper"]
         enemyTurn = random.choice(turnShapes)
         return enemyTurn
+        
+    def lostTurn(self, amount):
+        self.lives -= amount
