@@ -1,4 +1,4 @@
-from rouletteG import Game
+from roulette_game import Game
 from PySide6.QtCore import QSize, Qt
 from PySide6.QtGui import QAction, QFont
 from layout_colorWidget import Color
@@ -16,10 +16,10 @@ from PySide6.QtWidgets import (
 
 import sys
 
-class MainWindow(QMainWindow, Game):
+class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__(round=0)
-        
+        super().__init__()
+        self.game = None
         self.bg = Color("#576A8F")
         self.setCentralWidget(self.bg)
 
@@ -35,22 +35,35 @@ class MainWindow(QMainWindow, Game):
 
         self.layout2 = QVBoxLayout()
         
-        self.label1 = QLabel("Round: 0")
-        self.label1.setAlignment(Qt.AlignCenter)
-        self.label1.setStyleSheet("color: black;")
-        self.label1.setFont(self.font)
+        self.labelHZTOP1 = QLabel("Round: 0")
+        self.labelHZTOP1.setAlignment(Qt.AlignCenter)
+        self.labelHZTOP1.setStyleSheet("color: black;")
+        self.labelHZTOP1.setFont(self.font)
         
-        self.layout1.addWidget(self.label1)
-
+        self.layout1.addWidget(self.labelHZTOP1)
+        
+        self.labelHZTOP2 = QLabel("Lives: 0")
+        self.labelHZTOP2.setAlignment(Qt.AlignCenter)
+        self.labelHZTOP2.setStyleSheet("color: black;")
+        self.labelHZTOP2.setFont(self.font)
+        
+        self.layout1.addWidget(self.labelHZTOP2)
         
         self.label2 = QLabel("Set Round: ")
-        self.input = QLineEdit()
-        self.input.setPlaceholderText("Max 5 rounds")
+        self.input1 = QLineEdit()
+        self.label3 = QLabel("Set Live: ")
+        self.input2 = QLineEdit()
+        self.input2.setPlaceholderText("Max 5 lives")
+        self.input1.setPlaceholderText("Max 5 rounds")
         self.button = QPushButton("OK")
+
         self.layout2.addWidget(self.label2)
-        self.layout2.addWidget(self.input)
+        self.layout2.addWidget(self.input1)
+        self.layout2.addWidget(self.label3)
+        self.layout2.addWidget(self.input2)
         self.layout2.addWidget(self.button)
 
+        self.button.clicked.connect(self.clickedAndDelete)
         self.button.clicked.connect(self.handleRoundClicked)
 
         self.main_container.addLayout(self.layout1)
@@ -60,13 +73,36 @@ class MainWindow(QMainWindow, Game):
         
 
     def handleRoundClicked(self):
-        data = self.input.text()
-        self.gameRules(data)
+        round_fromUI = self.input1.text()
+        lives_fromUI = self.input2.text()
+        self.game = Game(round_fromUI, lives_fromUI)
+
         self.setUI()
 
     def setUI(self):
-        self.label1.setText(f'Round: {self.round}')
-        self.main_container.hide()
+        self.labelHZTOP1.setText(f'Round: {self.game.round}')
+        self.labelHZTOP2.setText(f'Live: {self.game.player.lives}')
+
+    def clickedAndDelete(self):
+        self.clear_layout(self.layout2)
+
+        self.main_container.removeItem(self.layout2)
+
+    def clear_layout(self, layout):
+        if layout == None:
+            return
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget != None:
+                widget.deleteLater()
+            elif item.layout() != None:
+                self.clear_layout(item.layout())
+
+
+            
+        
+
 
         # layout1 = QHBoxLayout()
         # layout2 = QVBoxLayout()

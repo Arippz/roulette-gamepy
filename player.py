@@ -1,26 +1,23 @@
-import random
-# if rock == True and scissor == True:
-#     scissor == False
 
+import random
 class Player():
     def __init__(self, username, lives, turn):
         self.username = username
         self.lives = lives
+        self.turn = turn
 
-    @staticmethod
-    def playerTurn():
-        turn = "rock"
-        return turn
+    def playerTurn(self):
+        self.turn = "rock"
+
 class Enemy():
 
-    def __init__(self, lives, enemyTurn):
+    def __init__(self, username, lives, enemyTurn):
+        self.username = username
         self.lives = lives
-    
-    @staticmethod
-    def turnShuffle():
+        self.enemyTurn = enemyTurn
+    def turnShuffle(self):
         turnShapes = ["rock", "scissor", "paper"]
-        enemyTurn = random.choice(turnShapes)
-        return enemyTurn
+        self.enemyTurn = random.choice(turnShapes)
         
     def lostTurn(self, amount):
         self.lives -= amount
