@@ -1,6 +1,7 @@
 from roulette_game import Game
+from iconButton import *
 from PySide6.QtCore import QSize, Qt
-from PySide6.QtGui import QAction, QFont
+from PySide6.QtGui import QAction, QFont, QPixmap, QIcon
 from layout_colorWidget import Color
 from PySide6.QtWidgets import (
     QApplication,
@@ -15,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 import sys
+import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -32,7 +34,6 @@ class MainWindow(QMainWindow):
 
 
         self.layout1 = QHBoxLayout()
-
         self.layout2 = QVBoxLayout()
         
         self.labelHZTOP1 = QLabel("Round: 0")
@@ -63,8 +64,9 @@ class MainWindow(QMainWindow):
         self.layout2.addWidget(self.input2)
         self.layout2.addWidget(self.button)
 
+
         self.button.clicked.connect(self.clickedAndDelete)
-        self.button.clicked.connect(self.handleRoundClicked)
+        self.button.clicked.connect(self.startGame)
 
         self.main_container.addLayout(self.layout1)
         self.main_container.addLayout(self.layout2)
@@ -72,16 +74,26 @@ class MainWindow(QMainWindow):
 
         
 
-    def handleRoundClicked(self):
+    def startGame(self):
         round_fromUI = self.input1.text()
         lives_fromUI = self.input2.text()
         self.game = Game(round_fromUI, lives_fromUI)
-
         self.setUI()
 
     def setUI(self):
         self.labelHZTOP1.setText(f'Round: {self.game.round}')
         self.labelHZTOP2.setText(f'Live: {self.game.player.lives}')
+        newLayout = QHBoxLayout()
+        image_path = "assets/images"
+        images = ["rock.png", "paper.png", "scissor.png"]
+        for file in images:
+            full_path = os.path.join(image_path, file)
+            pixmap = QPixmap(full_path)
+            button1 = IconButton()
+            button1.setIcon(QIcon(pixmap))
+            newLayout.addWidget(button1)
+        self.main_container.addLayout(newLayout)
+
 
     def clickedAndDelete(self):
         self.clear_layout(self.layout2)
