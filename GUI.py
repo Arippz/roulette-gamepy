@@ -18,38 +18,39 @@ from PySide6.QtWidgets import (
 import sys
 import os
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.game = None
         self.bg = Color("#576A8F")
         self.setCentralWidget(self.bg)
+        self.setFixedSize(600, 300)
 
-        
         self.font = QFont()
         self.font.setWeight(QFont.Weight.Bold)
         self.setWindowTitle("RouletteG")
 
         self.main_container = QVBoxLayout(self.bg)
 
-
         self.layout1 = QHBoxLayout()
         self.layout2 = QVBoxLayout()
-        
+        self.layout3 = QHBoxLayout()
+
         self.labelHZTOP1 = QLabel("Round: 0")
         self.labelHZTOP1.setAlignment(Qt.AlignCenter)
         self.labelHZTOP1.setStyleSheet("color: black;")
         self.labelHZTOP1.setFont(self.font)
-        
+
         self.layout1.addWidget(self.labelHZTOP1)
-        
+
         self.labelHZTOP2 = QLabel("Lives: 0")
         self.labelHZTOP2.setAlignment(Qt.AlignCenter)
         self.labelHZTOP2.setStyleSheet("color: black;")
         self.labelHZTOP2.setFont(self.font)
-        
+
         self.layout1.addWidget(self.labelHZTOP2)
-        
+
         self.label2 = QLabel("Set Round: ")
         self.input1 = QLineEdit()
         self.label3 = QLabel("Set Live: ")
@@ -64,35 +65,47 @@ class MainWindow(QMainWindow):
         self.layout2.addWidget(self.input2)
         self.layout2.addWidget(self.button)
 
-
         self.button.clicked.connect(self.clickedAndDelete)
         self.button.clicked.connect(self.startGame)
 
         self.main_container.addLayout(self.layout1)
         self.main_container.addLayout(self.layout2)
 
-
-        
-
     def startGame(self):
         round_fromUI = self.input1.text()
         lives_fromUI = self.input2.text()
         self.game = Game(round_fromUI, lives_fromUI)
-        self.setUI()
+        enemyLayout = QVBoxLayout()
+        self.setUI(self.layout2, enemyLayout)
 
-    def setUI(self):
-        self.labelHZTOP1.setText(f'Round: {self.game.round}')
-        self.labelHZTOP2.setText(f'Live: {self.game.player.lives}')
-        newLayout = QHBoxLayout()
+    def setUI(self, playerLayout, enemyLayout):
+        self.labelHZTOP1.setText(f"Round: {self.game.round}")
+        self.labelHZTOP2.setText(f"Live: {self.game.player.lives}")
+        if playerLayout:
+            username = QLabel(f"{self.game.player.username}: ")
+            playerLayout.addWidget(username)
+            enemyName = QLabel(f"{self.game.enemy.username}: ")
+            enemyLayout.addWidget(enemyName)
+            
         image_path = "assets/images"
         images = ["rock.png", "paper.png", "scissor.png"]
-        for file in images:
-            full_path = os.path.join(image_path, file)
-            pixmap = QPixmap(full_path)
-            button1 = IconButton()
-            button1.setIcon(QIcon(pixmap))
-            newLayout.addWidget(button1)
-        self.main_container.addLayout(newLayout)
+
+        for layout in (playerLayout, enemyLayout):
+            for file in images:
+                full_path = os.path.join(image_path, file)
+                pixmap = QPixmap(full_path)
+                button1 = IconButton()
+                button1.setIcon(QIcon(pixmap))
+                layout.addWidget(button1)
+
+
+        gameStartlabel = QLabel("VS")
+        gameStartlabel.setAlignment(Qt.AlignCenter)
+
+        self.main_container.addLayout(self.layout3)
+        self.layout3.addLayout(playerLayout)
+        self.layout3.addWidget(gameStartlabel)
+        self.layout3.addLayout(enemyLayout)
 
 
     def clickedAndDelete(self):
@@ -110,11 +123,6 @@ class MainWindow(QMainWindow):
                 widget.deleteLater()
             elif item.layout() != None:
                 self.clear_layout(item.layout())
-
-
-            
-        
-
 
         # layout1 = QHBoxLayout()
         # layout2 = QVBoxLayout()
@@ -138,7 +146,6 @@ class MainWindow(QMainWindow):
         # self.setCentralWidget(widget)
 
 
-    
 app = QApplication(sys.argv)
 
 window = MainWindow()
