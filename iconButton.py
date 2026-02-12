@@ -8,5 +8,4 @@ class IconButton(QPushButton):
         self.setIconSize(self.size())
         self.setStyleSheet("IconButton { padding-left: 0; margin: 16px; }")
         super().resizeEvent(e)
-
     

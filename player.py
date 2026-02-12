@@ -18,6 +18,8 @@ class Enemy():
     def turnShuffle(self):
         turnShapes = ["rock", "scissor", "paper"]
         self.enemyTurn = random.choice(turnShapes)
+        print(self.enemyTurn)
         
     def lostTurn(self, amount):
         self.lives -= amount
+

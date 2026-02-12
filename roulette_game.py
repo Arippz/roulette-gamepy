@@ -1,7 +1,8 @@
 from player import Player, Enemy
 class Game():
-    def __init__(self, round, lives):
+    def __init__(self, gameRun, round, lives):
         super().__init__()
+        self.gameRun = gameRun
         self.round = round
         self.player = Player("Player", lives, False)
         self.enemy = Enemy("Enemy", lives, False)

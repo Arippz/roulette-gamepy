@@ -67,16 +67,33 @@ class MainWindow(QMainWindow):
 
         self.button.clicked.connect(self.clickedAndDelete)
         self.button.clicked.connect(self.startGame)
-
         self.main_container.addLayout(self.layout1)
         self.main_container.addLayout(self.layout2)
 
     def startGame(self):
-        round_fromUI = self.input1.text()
-        lives_fromUI = self.input2.text()
-        self.game = Game(round_fromUI, lives_fromUI)
-        enemyLayout = QVBoxLayout()
-        self.setUI(self.layout2, enemyLayout)
+            round_fromUI = self.input1.text()
+            lives_fromUI = self.input2.text()
+            self.game = Game(True, round_fromUI, lives_fromUI)
+            
+            while self.game.gameRun == True:
+                enemyLayout = QVBoxLayout()
+                self.setUI(self.layout2, enemyLayout)
+                break
+
+
+
+    def turnBtnPushed(self, playerwidget):
+        print(playerwidget)
+        # newobjName = ["rock", "paper", "scissor"]
+        # for i in newobjName:
+        #     objName = playerwid
+
+        # if playerLayout:
+        #     for index in range(playerLayout.count()):
+        #         tes = playerLayout.itemAt(index)
+        # elif enemyLayout.isSignalConnected():
+        #     for index in range(enemyLayout.count()):
+        #         tes = enemyLayout.itemAt(index)            
 
     def setUI(self, playerLayout, enemyLayout):
         self.labelHZTOP1.setText(f"Round: {self.game.round}")
@@ -89,14 +106,27 @@ class MainWindow(QMainWindow):
             
         image_path = "assets/images"
         images = ["rock.png", "paper.png", "scissor.png"]
+        objName = ["rock", "paper", "scissor"]
+            
+
 
         for layout in (playerLayout, enemyLayout):
-            for file in images:
-                full_path = os.path.join(image_path, file)
-                pixmap = QPixmap(full_path)
-                button1 = IconButton()
-                button1.setIcon(QIcon(pixmap))
-                layout.addWidget(button1)
+            svdBtn = []
+            for file, item in zip (images, objName):
+                fullPath = os.path.join(image_path, file)
+                pixmap = QPixmap(fullPath)
+                self.turnBtn = IconButton(self)
+                self.turnBtn.setIcon(QIcon(pixmap))
+                self.turnBtn.setObjectName("turnBtn" + item.capitalize())
+                layout.addWidget(self.turnBtn)
+                saved_icon = self.turnBtn.icon()
+                svdBtn.append(saved_icon)
+        for i in range (1, playerLayout.count()):
+            playerWidget = playerLayout.itemAt(i).widget()
+            playerWidget.clicked.connect(lambda checked=False, w=playerWidget: self.turnBtnPushed(w))
+
+
+
 
 
         gameStartlabel = QLabel("VS")
@@ -106,7 +136,6 @@ class MainWindow(QMainWindow):
         self.layout3.addLayout(playerLayout)
         self.layout3.addWidget(gameStartlabel)
         self.layout3.addLayout(enemyLayout)
-
 
     def clickedAndDelete(self):
         self.clear_layout(self.layout2)
