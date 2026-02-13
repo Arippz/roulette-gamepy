@@ -23,6 +23,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.game = None
+        self.turnDecided = []
         self.bg = Color("#576A8F")
         self.setCentralWidget(self.bg)
         self.setFixedSize(600, 300)
@@ -83,7 +84,12 @@ class MainWindow(QMainWindow):
 
 
     def turnBtnPushed(self, playerwidget):
-        print(playerwidget)
+        svdicon = playerwidget.icon()
+        self.turnDecided = IconButton(playerwidget)
+        self.turnDecided.setIcon(svdicon)
+        
+        # if playerwidget.objectName() == "turnBtnScissor":
+            
         # newobjName = ["rock", "paper", "scissor"]
         # for i in newobjName:
         #     objName = playerwid
@@ -132,9 +138,23 @@ class MainWindow(QMainWindow):
         gameStartlabel = QLabel("VS")
         gameStartlabel.setAlignment(Qt.AlignCenter)
 
+        pixmap = QPixmap('assets/images/outline-square.png')
+        turnSpace = QLabel()
+        turnSpace.setPixmap(pixmap)
+        turnSpace.setScaledContents(True)
+        turnSpace.setFixedSize(50, 50)
+
+        enemyturnSpace = QLabel()
+        enemyturnSpace.setPixmap(pixmap)
+        enemyturnSpace.setScaledContents(True)
+        enemyturnSpace.setFixedSize(50, 50)
+
+        
         self.main_container.addLayout(self.layout3)
         self.layout3.addLayout(playerLayout)
+        self.layout3.addWidget(turnSpace)
         self.layout3.addWidget(gameStartlabel)
+        self.layout3.addWidget(enemyturnSpace)
         self.layout3.addLayout(enemyLayout)
 
     def clickedAndDelete(self):
