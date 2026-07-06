@@ -12,7 +12,6 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QWidget,
-    QMenu,
 )
 
 import sys
@@ -23,7 +22,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.game = None
-        self.turnDecided = []
+        self.turnDecided = ""
         self.bg = Color("#576A8F")
         self.setCentralWidget(self.bg)
         self.setFixedSize(600, 300)
@@ -32,18 +31,22 @@ class MainWindow(QMainWindow):
         self.font.setWeight(QFont.Weight.Bold)
         self.setWindowTitle("RouletteG")
 
+
+
         self.main_container = QVBoxLayout(self.bg)
+
+        self.floating_panel = None
+
 
         self.layout1 = QHBoxLayout()
         self.layout2 = QVBoxLayout()
-        self.layout3 = QHBoxLayout()
+        self.layout2.setObjectName("QVLayout")
 
-        self.labelHZTOP1 = QLabel("Round: 0")
+
+        self.labelHZTOP1 = QLabel("Enemy Lives: 0")
         self.labelHZTOP1.setAlignment(Qt.AlignCenter)
         self.labelHZTOP1.setStyleSheet("color: black;")
         self.labelHZTOP1.setFont(self.font)
-
-        self.layout1.addWidget(self.labelHZTOP1)
 
         self.labelHZTOP2 = QLabel("Lives: 0")
         self.labelHZTOP2.setAlignment(Qt.AlignCenter)
@@ -52,12 +55,15 @@ class MainWindow(QMainWindow):
 
         self.layout1.addWidget(self.labelHZTOP2)
 
-        self.label2 = QLabel("Set Round: ")
+
+        self.layout1.addWidget(self.labelHZTOP1)
+
+        self.label2 = QLabel("Set Opponent Lives: ")
         self.input1 = QLineEdit()
-        self.label3 = QLabel("Set Live: ")
+        self.label3 = QLabel("Set Lives: ")
         self.input2 = QLineEdit()
         self.input2.setPlaceholderText("Max 5 lives")
-        self.input1.setPlaceholderText("Max 5 rounds")
+        self.input1.setPlaceholderText("Max 5 lives")
         self.button = QPushButton("OK")
 
         self.layout2.addWidget(self.label2)
@@ -66,44 +72,71 @@ class MainWindow(QMainWindow):
         self.layout2.addWidget(self.input2)
         self.layout2.addWidget(self.button)
 
-        self.button.clicked.connect(self.clickedAndDelete)
-        self.button.clicked.connect(self.startGame)
+        self.button.clicked.connect(lambda: self.clickedAndDelete(self.layout2))
+        self.button.clicked.connect(lambda: self.startGame())
         self.main_container.addLayout(self.layout1)
-        self.main_container.addLayout(self.layout2)
+        self.main_container.addLayout(self.layout2) 
 
     def startGame(self):
-            round_fromUI = self.input1.text()
-            lives_fromUI = self.input2.text()
-            self.game = Game(True, round_fromUI, lives_fromUI)
+        enemylives_fromUI = str(self.input1.text())
+        lives_fromUI = str(self.input2.text()) 
+        self.game = Game(enemylives_fromUI, lives_fromUI, False, False)
+        enemyLayout = QVBoxLayout()
+        playerLayout = QVBoxLayout()
+        self.setUI(playerLayout, enemyLayout)
             
-            while self.game.gameRun == True:
-                enemyLayout = QVBoxLayout()
-                self.setUI(self.layout2, enemyLayout)
-                break
 
 
+    def turnBtnPushed(self, playerwidget, enemylayout):
+        result1 = playerwidget.objectName()
+        print(result1)
+        if playerwidget.objectName() == "turnBtnRock":
+            self.turnDecided = "rock"
+        elif playerwidget.objectName() == "turnBtnPaper":
+            self.turnDecided = "paper"
+        else:
+            self.turnDecided = "scissor"
+        self.game.player.playerTurn(self.turnDecided)
+        self.game.enemy.turnShuffle()
 
-    def turnBtnPushed(self, playerwidget):
-        svdicon = playerwidget.icon()
-        self.turnDecided = IconButton(playerwidget)
-        self.turnDecided.setIcon(svdicon)
+        if self.game.enemy.enemyTurn == "rock":
+            i = 1
+        elif self.game.enemy.enemyTurn == "paper":
+            i = 2
+        else:
+            i = 3
+        removeP = self.layout3.takeAt(1)
+        removeP.widget().deleteLater()
+        removeE = self.layout3.takeAt(2)
+        removeE.widget().deleteLater()
+        enemywidget = enemylayout.itemAt(i).widget()
+        playerIcon = playerwidget.icon()
+        enemyIcon = enemywidget.icon()
+        playerCpy = IconButton(playerwidget)
+        playerCpy.setIcon(playerIcon)
+        enemyCpy = IconButton(enemywidget)
+        enemyCpy.setIcon(enemyIcon)
+        self.layout3.insertWidget(1, playerCpy)
+        self.layout3.insertWidget(3, enemyCpy)
+        self.game.game(True)
+        self.labelHZTOP1.setText(f"Opponent Lives: {str(self.game.enemy.lives)}")
+        self.labelHZTOP2.setText(f"Lives: {str(self.game.player.lives)}")
+        self.labelHZTOP1.update()
+        self.labelHZTOP2.update()
         
-        # if playerwidget.objectName() == "turnBtnScissor":
-            
-        # newobjName = ["rock", "paper", "scissor"]
-        # for i in newobjName:
-        #     objName = playerwid
 
-        # if playerLayout:
-        #     for index in range(playerLayout.count()):
-        #         tes = playerLayout.itemAt(index)
-        # elif enemyLayout.isSignalConnected():
-        #     for index in range(enemyLayout.count()):
-        #         tes = enemyLayout.itemAt(index)            
+
+        if not self.game.gameRun:
+            self.setResult()
+                 
+
+
 
     def setUI(self, playerLayout, enemyLayout):
-        self.labelHZTOP1.setText(f"Round: {self.game.round}")
-        self.labelHZTOP2.setText(f"Live: {self.game.player.lives}")
+        self.layout3 = QHBoxLayout()
+        self.layout3.setObjectName("QHLayout")
+        self.labelHZTOP1.setText(f"Enemy Lives: {str(self.game.enemy.lives)}")
+        self.labelHZTOP2.setText(f"Live: {str(self.game.player.lives)}")
         if playerLayout:
             username = QLabel(f"{self.game.player.username}: ")
             playerLayout.addWidget(username)
@@ -129,38 +162,86 @@ class MainWindow(QMainWindow):
                 svdBtn.append(saved_icon)
         for i in range (1, playerLayout.count()):
             playerWidget = playerLayout.itemAt(i).widget()
-            playerWidget.clicked.connect(lambda checked=False, w=playerWidget: self.turnBtnPushed(w))
+            playerWidget.clicked.connect(lambda checked=False, w=playerWidget: self.turnBtnPushed(w, enemyLayout))
 
 
 
-
-
+        InvisLabel1 = QLabel()
+        InvisLabel1.hide()
         gameStartlabel = QLabel("VS")
+        InvisLabel2 = QLabel()
+        InvisLabel2.hide()
         gameStartlabel.setAlignment(Qt.AlignCenter)
 
-        pixmap = QPixmap('assets/images/outline-square.png')
-        turnSpace = QLabel()
-        turnSpace.setPixmap(pixmap)
-        turnSpace.setScaledContents(True)
-        turnSpace.setFixedSize(50, 50)
-
-        enemyturnSpace = QLabel()
-        enemyturnSpace.setPixmap(pixmap)
-        enemyturnSpace.setScaledContents(True)
-        enemyturnSpace.setFixedSize(50, 50)
-
-        
-        self.main_container.addLayout(self.layout3)
         self.layout3.addLayout(playerLayout)
-        self.layout3.addWidget(turnSpace)
+        self.layout3.addWidget(InvisLabel1)
         self.layout3.addWidget(gameStartlabel)
-        self.layout3.addWidget(enemyturnSpace)
+        self.layout3.addWidget(InvisLabel2)
         self.layout3.addLayout(enemyLayout)
 
-    def clickedAndDelete(self):
-        self.clear_layout(self.layout2)
+        self.main_container.addLayout(self.layout3)
 
-        self.main_container.removeItem(self.layout2)
+
+    def setResult(self):
+        if self.floating_panel is not None:
+            self.floating_panel.close()
+            self.floating_panel.deleteLater()
+
+
+        if self.game.gameRun == False:
+            self.resultText = self.game.gameResult()
+            resultTextTop = QLabel(self.resultText)
+            resultTextTop.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            resultTextTop.setStyleSheet("color: white; font-size: 18px; font-weight: bold;")
+            
+
+            if self.resultText == "You Won":
+                p = "That was too ez, dont ya think?"
+            else:
+                p = "Uh oh, unlucky!"
+            resultText = QLabel(p)
+            resultText.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            resultText.setStyleSheet("color: #bdc3c7; font-size: 13px;")
+        else:
+            return
+
+
+        self.floating_panel = QWidget(self.bg)
+        self.floating_panel.setStyleSheet("""
+            QWidget {
+                background-color: rgba(44, 62, 80, 0.95);
+                border: 2px solid #34495e;
+                border-radius: 12px;
+            }
+        """)
+
+
+        self.float_layout = QVBoxLayout(self.floating_panel)
+        self.float_layout.addWidget(resultTextTop)
+        self.float_layout.addWidget(resultText)
+        
+
+        close_btn = QPushButton("Close", self.floating_panel)
+        close_btn.setStyleSheet("background-color: #e74c3c; color: white; padding: 4px; border-radius: 4px;")
+        close_btn.clicked.connect(self.floating_panel.close)
+        self.float_layout.addWidget(close_btn)
+
+
+        panel_w, panel_h = 280, 140
+        x = int((self.bg.width() - panel_w) / 2)
+        y = int((self.bg.height() - panel_h) / 2)
+        self.floating_panel.setGeometry(x, y, panel_w, panel_h)
+
+
+        self.floating_panel.raise_()
+        self.floating_panel.show()
+        
+
+    def clickedAndDelete(self, layout):
+        if layout.objectName() == "QVLayout":
+            self.clear_layout(layout)
+        elif layout.objectName() == "QHLayout":
+            self.main_container.removeItem(layout)
 
     def clear_layout(self, layout):
         if layout == None:
